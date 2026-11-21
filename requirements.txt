@@ -1,0 +1,7 @@
+# 实测通过环境：Python 3.12.11（AUP Learning Cloud）/ 3.13.14（本地 Windows）
+# 实测版本：gradio 6.30.0 / 6.32.0 · opencv 5.1.0 · numpy 2.5.5 · matplotlib 3.11.2 · requests 2.34.2
+gradio>=4.0
+opencv-python-headless>=4.8
+numpy>=1.24
+matplotlib>=3.7
+requests>=2.28

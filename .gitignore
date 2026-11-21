@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行时日志
+server.log
+*.log
+
+# 系统/IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 环境变量（含密钥，切勿提交）
+.env
+
+# 本地数据缓存（如自行下载的 MVTec 等）
+data/
+
+# Office 临时/锁文件
+~$*
+~WRL*.tmp
+*.tmp
