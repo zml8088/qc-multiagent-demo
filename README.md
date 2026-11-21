@@ -271,16 +271,8 @@ qc-multiagent-demo/
 ├── tools/
 │   ├── make_samples.py        # 把合成样本导出为图片（含总览图与 CSV）
 │   ├── make_architecture.py   # 生成系统架构图 figures/fig0_architecture.png
-│   ├── make_report_docx.py    # 把 docs/实践报告.md 排版为 .docx（宋体/黑体/表格/页码）
+│   ├── make_report_docx.py    # 把实践报告 Markdown 排版为 .docx（宋体/黑体/表格/页码）
 │   └── publish.sh             # 一键绑 remote 并推送到 GitHub / Gitee
-└── docs/
-    ├── Proposal.md            # 课程结课：规划说明
-    ├── 实践报告.md             # 课程结课：实践报告（正文约 3300 字）
-    ├── 实践报告.docx           # 上述报告的排版稿（提交用）
-    ├── 算力需求设计.md         # 课程结课：未来算力需求设计
-    ├── 实验报告.md             # 实验设计、结果、图表说明（报告可直接引用）
-    ├── 汇报稿.md               # 结课汇报讲稿（约 2 分 50 秒，含时间码）
-    └── 汇报稿.docx             # 上述讲稿的排版稿
 ```
 
 ---
@@ -322,7 +314,7 @@ python app.py
 | 图2 | `figures/fig2_samples.png`       | 合成的螺丝/螺母缺陷样本（划痕、变形/色差、缺料、锈蚀，含机加工纹理与光照波动） |
 | 图3 | `figures/fig3_feature_space.png` | 感知特征空间，良品与各类缺陷的分布边界                      |
 
-详细实验设计与可引用数字见 [`docs/实验报告.md`](docs/实验报告.md)。
+实验的全部原始数字（表 1、表 2）由 `run_experiment.py` 一键复现，任何人均可验证。
 
 ---
 
@@ -377,7 +369,7 @@ bash tools/publish.sh <你的GitHub用户名>
 bash tools/publish.sh <你的GitHub用户名> qc-multiagent-demo <你的Gitee用户名>
 ```
 
-脚本会自动把分支统一为 `main`、绑定 remote、推送，并把 README 与 docs/实践报告.md 里的 `<用户名>` `<仓库名>` 占位符替换成真实地址。令牌仍由 git 交互式询问，脚本不读取也不保存。
+脚本会自动把分支统一为 `main`、绑定 remote、推送，并把 README 里的 `<用户名>` `<仓库名>` 占位符替换成真实地址。令牌仍由 git 交互式询问，脚本不读取也不保存。
 
 **方式 B　手动执行**
 
@@ -404,14 +396,9 @@ Gitee　仓库页 → 管理 → 仓库设置 → 开源。
 
 设完用**无痕窗口**（未登录状态）打开仓库地址，能看到文件列表即视为满足课程要求，建议截图留存。
 
-### 10.5 第五步　把真实地址回填到文档
+### 10.5 第五步　核对地址回填
 
-推送成功后，把下面几处占位符换成你的真实地址，否则报告里会留着 `<用户名>` 交上去。
-
-- `docs/实践报告.md` 末尾第八节开源与总结之后的两行（开源仓库、云端预演地址）
-- 本文 4.2 节方式 B 的 `git clone` 地址
-
-用 10.3 方式 A 的话这一步脚本已代劳。改完提交并推送。
+本仓库的地址已回填进 4.2 节的 `git clone` 示例与本文 10.3 方式 B；若以后更换仓库名或账号，把这两处连同 remote 地址一起改掉即可，改完提交并推送。
 
 ```bash
 git add -A && git commit -m "docs: 回填开源仓库地址" && git push
