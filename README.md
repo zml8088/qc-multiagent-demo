@@ -133,7 +133,7 @@ pwd && ls          # 确认能看到 app.py / requirements.txt
 
 ```bash
 cd ~
-git clone https://github.com/<你的用户名>/<仓库名>.git qc-multiagent-demo
+git clone https://github.com/zml8088/qc-multiagent-demo.git qc-multiagent-demo
 cd qc-multiagent-demo
 ```
 
@@ -235,8 +235,8 @@ Demo 有三个页签：
 这个项目没有现成的样本文件夹，样本是运行时用代码现生成的，仓库能轻一点，真值也不会错。
 
 - 生成逻辑在 `qc_demo/synthetic_data.py`：`generate_one(part, defect, severity)` 生成单张，`generate_dataset(n, seed)` 生成成套。
-- `app.py`、`run_experiment.py` 里都是现场生成，比如 `generate_dataset(140, seed=7)`（开发集）和 `generate_dataset(160, seed=99)`（测试集）。种子固定，任何人跑出来都一样。
-- 仓库里已经附了一份导出结果，`samples/` 下有 26 张样本（命名 `件型__缺陷__严重度.png`）、一张 `grid.png` 总览图，以及记录真值的 `labels.csv`，可以直接打开看。
+- `app.py`、`run_experiment.py`、`make_figures.py` 里都是现场生成，比如 `generate_dataset(140, seed=7)`（开发集）和 `generate_dataset(160, seed=99)`（测试集）。种子固定，任何人跑出来都一样。
+- 想看到图片文件的话，跑 `python tools/make_samples.py`，会在 `samples/` 下导出 26 张样本（命名 `件型__缺陷__严重度.png`）、一张 `grid.png` 总览图，以及记录真值的 `labels.csv`。仓库里已经附了一份导出结果，可以直接打开看。
 - 报告用的样本拼图另有 `figures/fig2_samples.png`。
 - 换真实数据（MVTec AD）时，把图像放到 `data/` 下（该目录已在 .gitignore 里），按第 7 节组织标签即可。
 
@@ -248,6 +248,7 @@ qc-multiagent-demo/
 ├── run_experiment.py      # 无 UI 完整实验：基线 + 优化闭环 + 提示词演化
 ├── selftest.py            # 快速自检：优化闭环是否跑通并提升
 ├── diag.py                # 感知层诊断：打印各缺陷/严重度的特征分布，用于标定判据阈值
+├── make_figures.py        # 生成报告用三张图
 ├── requirements.txt       # 依赖清单（文件头注明实测通过版本）
 ├── optimized_prompt.txt   # 优化后最终提示词（自动产出）
 ├── LICENSE                # MIT 开源许可
@@ -259,14 +260,27 @@ qc-multiagent-demo/
 │   ├── pipeline.py        # 流水线、评测、优化闭环、单阈值基线
 │   └── __init__.py
 ├── figures/
-│   ├── fig0_architecture.png   # 系统架构图
+│   ├── fig0_architecture.png   # 系统架构图（由 tools/make_architecture.py 生成）
 │   ├── fig1_optimization.png   # 提示词优化曲线
 │   ├── fig2_samples.png        # 合成缺陷样本示例
 │   └── fig3_feature_space.png  # 感知特征空间（良品/缺陷分布）
-├── samples/                   # 导出好的样本图片 + 真值表
+├── samples/                   # 导出好的样本图片 + 真值表（由 tools/make_samples.py 生成）
 │   ├── screw__scratch__mild.png  # 命名规则：件型__缺陷__严重度
 │   ├── grid.png                 # 26 张样本总览拼图
 │   └── labels.csv               # 每张图的真值（part/defect/severity/grade）
+├── tools/
+│   ├── make_samples.py        # 把合成样本导出为图片（含总览图与 CSV）
+│   ├── make_architecture.py   # 生成系统架构图 figures/fig0_architecture.png
+│   ├── make_report_docx.py    # 把 docs/实践报告.md 排版为 .docx（宋体/黑体/表格/页码）
+│   └── publish.sh             # 一键绑 remote 并推送到 GitHub / Gitee
+└── docs/
+    ├── Proposal.md            # 课程结课：规划说明
+    ├── 实践报告.md             # 课程结课：实践报告（正文约 3300 字）
+    ├── 实践报告.docx           # 上述报告的排版稿（提交用）
+    ├── 算力需求设计.md         # 课程结课：未来算力需求设计
+    ├── 实验报告.md             # 实验设计、结果、图表说明（报告可直接引用）
+    ├── 汇报稿.md               # 结课汇报讲稿（约 2 分 50 秒，含时间码）
+    └── 汇报稿.docx             # 上述讲稿的排版稿
 ```
 
 ---
@@ -308,7 +322,7 @@ python app.py
 | 图2 | `figures/fig2_samples.png`       | 合成的螺丝/螺母缺陷样本（划痕、变形/色差、缺料、锈蚀，含机加工纹理与光照波动） |
 | 图3 | `figures/fig3_feature_space.png` | 感知特征空间，良品与各类缺陷的分布边界                      |
 
-详细实验设计与可引用数字，运行 `python run_experiment.py` 即可复现。
+详细实验设计与可引用数字见 [`docs/实验报告.md`](docs/实验报告.md)。
 
 ---
 
@@ -349,18 +363,34 @@ Gitee　头像 → 设置 → 安全设置 → 私人令牌 → 生成新令牌�
 
 推送时终端会问两样东西，用户名填你的**账号名**，密码框粘贴刚才的**令牌**。粘贴后不回显是正常的，回车即可。
 
-### 10.3 第三步　推送
+### 10.3 第三步　推送（两条路，选一条）
+
+**方式 A　一键脚本（推荐）**
+
+```bash
+cd qc-multiagent-demo
+
+# 只推 GitHub
+bash tools/publish.sh <你的GitHub用户名>
+
+# GitHub + Gitee 都推
+bash tools/publish.sh <你的GitHub用户名> qc-multiagent-demo <你的Gitee用户名>
+```
+
+脚本会自动把分支统一为 `main`、绑定 remote、推送，并把 README 与 docs/实践报告.md 里的 `<用户名>` `<仓库名>` 占位符替换成真实地址。令牌仍由 git 交互式询问，脚本不读取也不保存。
+
+**方式 B　手动执行**
 
 ```bash
 cd qc-multiagent-demo
 
 # GitHub
-git remote add origin https://github.com/<用户名>/<仓库名>.git
+git remote add origin https://github.com/zml8088/qc-multiagent-demo.git
 git branch -M main
 git push -u origin main        # 口令处填 Personal Access Token
 
 # Gitee（如需两个平台都发）
-git remote add gitee https://gitee.com/<用户名>/<仓库名>.git
+git remote add gitee https://gitee.com/zml8088/qc-multiagent-demo.git
 git push -u gitee main         # 口令处填 Gitee 私人令牌
 ```
 
@@ -378,9 +408,10 @@ Gitee　仓库页 → 管理 → 仓库设置 → 开源。
 
 推送成功后，把下面几处占位符换成你的真实地址，否则报告里会留着 `<用户名>` 交上去。
 
+- `docs/实践报告.md` 末尾第八节开源与总结之后的两行（开源仓库、云端预演地址）
 - 本文 4.2 节方式 B 的 `git clone` 地址
 
-改完提交并推送。
+用 10.3 方式 A 的话这一步脚本已代劳。改完提交并推送。
 
 ```bash
 git add -A && git commit -m "docs: 回填开源仓库地址" && git push
